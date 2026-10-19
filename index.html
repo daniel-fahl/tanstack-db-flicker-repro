@@ -30,18 +30,18 @@
       pre-update state for 10–30 ms, then the updated state again. Without persistence, this never happens.
     </p>
 
-    <h2>Where we hit it</h2>
+    <h2>Where I hit it</h2>
     <p>
-      We build a shopping list app with this stack. A user adds an item and ticks it off. The tick disappears for a
+      I build a shopping list app with this stack. A user adds an item and ticks it off. The tick disappears for a
       moment, then comes back. An action that runs during that gap reads the old state: "clear bought items" saw the
-      item as not bought and left it on the list. With 10× CPU throttling, the gap reached 263 ms in our app.
+      item as not bought and left it on the list. With 10× CPU throttling, the gap reached 263 ms in my app.
     </p>
 
     <h2>Modes</h2>
     <p>Each mode is its own page load. The highlighted row is the current one.</p>
     <table>
       <thead>
-        <tr><th>Mode</th><th>What changes</th><th>Result for us</th></tr>
+        <tr><th>Mode</th><th>What changes</th><th>My result</th></tr>
       </thead>
       <tbody>
         <tr data-mode="default">
@@ -55,14 +55,14 @@
           <td>0 of 30.</td>
         </tr>
         <tr data-mode="settle">
-          <td><a href="?settle=150">Our workaround</a></td>
+          <td><a href="?settle=150">My workaround</a></td>
           <td>Persistence on. The handler waits 150 ms after <code>awaitTxId</code> resolves.</td>
           <td>0 of 30.</td>
         </tr>
         <tr data-mode="outbox">
           <td><a href="?via=outbox">Outbox</a></td>
-          <td>Persistence on. Writes go through <code>@tanstack/offline-transactions</code>, as in our app.</td>
-          <td>Mostly 0 of 30. The outbox sends one write at a time, so the update leaves only after the insert is confirmed and stored. It flickers when storing takes longer than that round trip. Our app has 9 collections in one database, and there a store took 64 ms.</td>
+          <td>Persistence on. Writes go through <code>@tanstack/offline-transactions</code>, as in my app.</td>
+          <td>Mostly 0 of 30. The outbox sends one write at a time, so the update leaves only after the insert is confirmed and stored. It flickers when storing takes longer than that round trip. My app has 9 collections in one database, and there a store took 64 ms.</td>
         </tr>
       </tbody>
     </table>
@@ -80,8 +80,8 @@
     <p id="stats">No runs yet.</p>
     <ol id="log"></ol>
 
-    <h2>What we traced</h2>
-    <p>We added timing logs to the libraries in our app. A flickering run goes like this:</p>
+    <h2>What I traced</h2>
+    <p>I added timing logs to the libraries in my app. A flickering run goes like this:</p>
     <ol>
       <li>The insert's synced transaction is stored in SQLite before it becomes visible. The store holds the runtime's <code>applyMutex</code>.</li>
       <li>The update's txid arrives during that store. <code>lifecycle.publishEvidence</code> runs right after <code>commitSourceTransaction()</code>, so <code>awaitTxId</code> resolves.</li>
@@ -89,7 +89,7 @@
       <li><code>onUpdate</code> returns and the transaction completes. <code>recomputeOptimisticState</code> holds optimistic rows only for keys in a committed pending synced transaction, so the update's optimistic row is dropped.</li>
       <li>The collection shows the pre-update state until the update's synced transaction is stored and applied.</li>
     </ol>
-    <p>A log from our app, in ms since page load:</p>
+    <p>A log from my app, in ms since page load:</p>
 <pre>awaitTxId(51391) resolved at 1194.7   list_items pendingSyncedTransactions: none
 applyMutex: insert's store held 1149 → 1212; update's store waited 17.9 ms
 optimistic row dropped, DOM shows unticked at 1203.2
