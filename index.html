@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>awaitTxId flicker with SQLite persistence</title>
+    <style>
+      body { font: 15px/1.5 system-ui, sans-serif; max-width: 52rem; margin: 2rem auto; padding: 0 1rem; color: #222; }
+      h1 { font-size: 1.3rem; }
+      button { font: inherit; padding: .4rem .9rem; margin-right: .4rem; }
+      #mode { font-weight: 600; }
+      #stats { font-size: 1.1rem; font-weight: 600; margin: 1rem 0; }
+      .bad { color: #b00020; }
+      .good { color: #1b6e2e; }
+      ol { font: 13px/1.6 ui-monospace, monospace; padding-left: 1.4rem; }
+      nav a { margin-right: 1rem; }
+      p.note { color: #555; }
+    </style>
+  </head>
+  <body>
+    <h1><code>awaitTxId</code> resolves before persisted rows reach the collection</h1>
+    <p>
+      Todos synced through <code>@tanstack/electric-db-collection</code>, wrapped in
+      <code>persistedCollectionOptions</code> with browser SQLite on OPFS. A fake in-page Electric server
+      stands in for Postgres and Electric. The write handler sends the change, then awaits <code>awaitTxId(txid)</code>.
+    </p>
+    <p>
+      Each run inserts a new todo and ticks it right away, like a user who adds an item and checks it off.
+      It records every state the collection shows for that todo: missing → unticked → ticked.
+      A flicker is any step back to an older state.
+    </p>
+    <nav>
+      Mode:
+      <a href="?">persistence on</a>
+      <a href="?persistence=off">persistence off</a>
+      <a href="?via=outbox">persistence on, offline-transactions</a>
+      <a href="?settle=150">persistence on + 150 ms workaround</a>
+    </nav>
+    <p>Current: <span id="mode"></span></p>
+    <button id="once" type="button">Add and tick once</button>
+    <button id="many" type="button">Add and tick 30 times</button>
+    <p id="stats">No runs yet.</p>
+    <p class="note">
+      DevTools → Performance → CPU 4× slowdown makes flickers more frequent and longer.
+    </p>
+    <ol id="log"></ol>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

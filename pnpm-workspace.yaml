@@ -1,0 +1,3 @@
+allowBuilds:
+  '@journeyapps/wa-sqlite': false
+  esbuild: true
