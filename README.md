@@ -2,6 +2,8 @@
 
 An Electric collection with `persistedCollectionOptions` inserts a row and updates it right away. Both handlers await `awaitTxId`. After the update is confirmed, the collection shows the pre-update state for 10–30 ms, then the updated state again. Without persistence, this never happens.
 
+**Issue:** [TanStack/db#2201](https://github.com/TanStack/db/issues/2201)
+
 **Open it:** [StackBlitz](https://stackblitz.com/github/daniel-fahl/tanstack-db-flicker-repro), or run `pnpm install && pnpm dev` and open the page. Click **Add and tick 30 times**.
 
 ## Where I hit it
