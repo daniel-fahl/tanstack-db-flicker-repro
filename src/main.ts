@@ -101,6 +101,9 @@ function record(id: string) {
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T
 const log = $<HTMLOListElement>('log')
 
+const currentMode = !withPersistence ? 'persistence-off' : settleMs ? 'settle' : viaOutbox ? 'outbox' : 'default'
+document.querySelector(`tr[data-mode="${currentMode}"]`)?.classList.add('current')
+
 $('mode').textContent = [
   `SQLite persistence ${withPersistence ? 'ON' : 'OFF'}`,
   viaOutbox ? 'writes through @tanstack/offline-transactions' : 'writes through onInsert/onUpdate',
